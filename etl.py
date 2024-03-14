@@ -16,15 +16,42 @@ config.read('dl.cfg')
 os.environ['AWS_ACCESS_KEY_ID']=config['AWS_ACCESS_KEY_ID']
 os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS_SECRET_ACCESS_KEY']
 def create_local_spark_session():
+    """This function creates local spark session.
+
+        Arguments:
+         None
+        Returns:
+         spark session with an appName "Test"
+        """
+
     return SparkSession.builder.master("local[*]").appName("Test").getOrCreate()
 
 def create_emr_spark_session():
+    """This function creates EMR spark session.
+
+        Arguments:
+         None
+        Returns:
+         spark session with an appName "App"
+        """
+
     return SparkSession \
             .builder \
             .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
             .appName("App") \
             .getOrCreate()
 def process_song_data(spark, input_data, output_data):
+    """This function reads song data file, extracts columns to create *songs* and *artists* tables,
+        and write them to parquet files.
+
+        Arguments:
+             spark: EMR spark session,
+             input_data,
+             output_data
+        Returns:
+             None
+            """
+
     schema = (
         spark.read.format("json").load(input_data + "/song_data/A/A/A/*.json").schema
     )
@@ -66,6 +93,20 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    """This function reads log data file, filter by actions for song plays,
+        extracts columns for *users* and *time* tables,
+        and write them to parquet files;
+        reads in song data to use for *songplays* table,
+        extract columns from joined song and log datasets to create *songplays* table,
+        and writes *songplays* table to parquet files partitioned by year and month.
+
+        Arguments:
+            spark: EMR spark session,
+            input_data,
+            output_data
+        Returns:
+            None
+    """
     # read log data file
     df = spark.read.format("json").load(input_data + "/log_data/*/*/*.json")
 
