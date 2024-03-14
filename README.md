@@ -20,5 +20,18 @@ The star schema optimized for queries on song play analysis includes
 
 ## Files
 
-**`etl.py`** reads data from S3, processes that data using Spark, and writes them back to S3
+**`etl.py`** reads data from S3, processes that data using Spark, and writes them back to S3 <br>
 **`requirements.txt`** contains libraries used in the pipeline
+
+## ETL pipeline
+
+1. Read song and log data from S3.
+2. Transform data to create five different tables (*songs*, *artists*, *users*, *time*, *songplays*).
+3. Write tables to partitioned parquet files in separate table directories on S3
+
+## How to run scripts
+
+1. Set environment variables `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` in `dl.cfg`
+2. Run ETL pipeline **`etl.py`**
+
+        python3 etl.py
