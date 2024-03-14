@@ -10,15 +10,20 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
+config = configparser.ConfigParser()
+config.read('dl.cfg')
 
+os.environ['AWS_ACCESS_KEY_ID']=config['AWS_ACCESS_KEY_ID']
+os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS_SECRET_ACCESS_KEY']
 def create_local_spark_session():
     return SparkSession.builder.master("local[*]").appName("Test").getOrCreate()
 
-
 def create_emr_spark_session():
-    return SparkSession.builder.appName("App").getOrCreate()
-
-
+    return SparkSession \
+            .builder \
+            .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
+            .appName("App") \
+            .getOrCreate()
 def process_song_data(spark, input_data, output_data):
     schema = (
         spark.read.format("json").load(input_data + "/song_data/A/A/A/*.json").schema
@@ -133,8 +138,9 @@ def process_log_data(spark, input_data, output_data):
 
 def main(input_prefix: str = None, output_prefix: str = None):
 
-
     spark = create_emr_spark_session()
+    input_data = "s3a://udacity-dend/"
+    output_data = ""
     try:
         process_song_data(spark, input_prefix, output_prefix)
         print("process_song_data done.")
